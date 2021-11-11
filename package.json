@@ -1,0 +1,23 @@
+{
+  "name": "nft",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vanillaes/csv": "^2.1.11",
+    "axios": "^0.22.0",
+    "canvas": "^2.8.0",
+    "cheerio": "^1.0.0-rc.10",
+    "chrome-launcher": "^0.14.1",
+    "crawler": "^1.3.0",
+    "lexico-node": "^0.1.8",
+    "nodemon": "^2.0.13",
+    "puppeteer": "^10.4.0",
+    "urban-dictionary": "^3.0.2"
+  }
+}
