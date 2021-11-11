@@ -13,4 +13,4 @@ Run ```node nftuploader.js``` again in a new terminal window, you should now be 
 
 Errors will be logged in an errors.log file. 
 
-Feel free to [Contact me](mailto:ishola.freelance@gmail.com) if you have any questions.
+Feel free to [Contact me](mailto:ishola.freelance@gmail.com) if you have any questions and be sure to leave a star.
