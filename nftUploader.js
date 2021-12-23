@@ -9,6 +9,7 @@ const fs = require("fs");
 // Get array containing URL paths to NFT images
 const arr = require("./wordArray");
 const extension_path = "extension/path"
+const collection_name = "nakahana"
 
 (async () => {
     try {
@@ -43,7 +44,7 @@ const extension_path = "extension/path"
         // Begin upload
         for (let i = 0; i < arr.length; i++) {
             try {
-                await page.goto("https://opensea.io/collection/nakahana/assets/create");
+                await page.goto(`https://opensea.io/collection/${collection_name}/assets/create`);
 
                 // select nft for upload
                 await page.waitForSelector('input[type=file]');
