@@ -41,7 +41,7 @@ const extension_path = "extension/path"
         const stream = fs.createWriteStream(path.join(__dirname, "errors.log"), { flags: "a" })
 
         // Begin upload
-        for (let i = 109; i < arr.length; i++) {
+        for (let i = 0; i < arr.length; i++) {
             try {
                 await page.goto("https://opensea.io/collection/nakahana/assets/create");
 
