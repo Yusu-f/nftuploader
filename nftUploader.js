@@ -7,12 +7,13 @@ const path = require("path");
 const fs = require("fs");
 
 // Get array containing URL paths to NFT images
-arr = require("./wordArray");
+const arr = require("./wordArray");
+const extension_path = "extension/path"
 
 (async () => {
     try {
         // Load metamask extension, replace path with your own  
-        const pathToExtension = require('path').join(__dirname, 'my-extension/nkbihfbeogaeaoehlefnkodbefgpgknn/10.2.2_0');
+        const pathToExtension = require('path').join(__dirname, extension_path);
         const newFlags = chromeLauncher.Launcher.defaultFlags().filter(flag => flag !== '--disable-extensions' && flag !== '--mute-audio');
 
         newFlags.push(`--start-maximized`,
