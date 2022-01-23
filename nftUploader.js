@@ -12,7 +12,7 @@ const extension_path = "extension/path"
 const collection_name = "nakahana"
 
 // Set to true to check if NFT has already been uploaded
-const searchBeforeUpload = false
+const searchBeforeUpload = false;
 
 (async () => {
     try {
