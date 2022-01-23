@@ -7,9 +7,12 @@ const path = require("path");
 const fs = require("fs");
 
 // Get array containing URL paths to NFT images
-const arr = require("./wordArray");
+const arr = require("path_to_array");
 const extension_path = "extension/path"
 const collection_name = "nakahana"
+
+// Set to true to check if NFT has already been uploaded
+const searchBeforeUpload = false
 
 (async () => {
     try {
@@ -43,7 +46,31 @@ const collection_name = "nakahana"
 
         // Begin upload
         for (let i = 0; i < arr.length; i++) {
+            let uploaded = false
             try {
+                if (searchBeforeUpload) {
+                    await page.goto(`https://opensea.io/collection/${collection_name}`);
+
+                    await page.waitForSelector('input[placeholder=Search]')
+                    await page.type('input[placeholder=Search]', arr[i]);
+                    await page.keyboard.press('Enter');
+
+                    try {
+                        // select listing
+                        await page.waitForSelector("#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > div:nth-child(4) > div > div > div > div.AssetSearchView--results.collection--results > div.Blockreact__Block-sc-1xf18x6-0.dBFmez.AssetsSearchView--assets > div.fresnel-container.fresnel-greaterThanOrEqual-sm > div > div > div > article > a > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.SpaceBetweenreact__SpaceBetween-sc-jjxyhg-0.AssetCardFooterreact__StyledContainer-sc-nedjig-0.bFcjdD.jYqxGr.gJwgfT.cBTfDg")
+                        await page.click("#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > div:nth-child(4) > div > div > div > div.AssetSearchView--results.collection--results > div.Blockreact__Block-sc-1xf18x6-0.dBFmez.AssetsSearchView--assets > div.fresnel-container.fresnel-greaterThanOrEqual-sm > div > div > div > article > a > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.SpaceBetweenreact__SpaceBetween-sc-jjxyhg-0.AssetCardFooterreact__StyledContainer-sc-nedjig-0.bFcjdD.jYqxGr.gJwgfT.cBTfDg")
+                        uploaded = true
+                    } catch (error) {
+                        if (error == "TimeoutError: waiting for selector `#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > div:nth-child(4) > div > div > div > div.AssetSearchView--results.collection--results > div.Blockreact__Block-sc-1xf18x6-0.dBFmez.AssetsSearchView--assets > div.fresnel-container.fresnel-greaterThanOrEqual-sm > div > div > div > article > a > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.SpaceBetweenreact__SpaceBetween-sc-jjxyhg-0.AssetCardFooterreact__StyledContainer-sc-nedjig-0.bFcjdD.jYqxGr.gJwgfT.cBTfDg` failed: timeout 10000ms exceeded") { 
+                            uploaded = false
+                        }
+                    }
+                }
+
+                if (uploaded) {
+                    continue
+                }
+                
                 await page.goto(`https://opensea.io/collection/${collection_name}/assets/create`);
 
                 // select nft for upload
