@@ -2,14 +2,15 @@
 
 const chromeLauncher = require('chrome-launcher');
 const axios = require('axios');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const path = require("path");
 const fs = require("fs");
+const dappeteer = require("@chainsafe/dappeteer")
 
 // Get array containing URL paths to NFT images
-const arr = require("path_to_array");
-const extension_path = "extension/path"
-const collection_name = "nakahana"
+const arr = require("./wordArray");
+const extension_path = "my-extension/nkbihfbeogaeaoehlefnkodbefgpgknn/10.2.2_0"
+const collection_name = "test-collecshun"
 
 // Set to true to check if NFT has already been uploaded
 const searchBeforeUpload = false;
@@ -32,14 +33,19 @@ const searchBeforeUpload = false;
         const { webSocketDebuggerUrl } = response.data;
 
         // Copy this log somewhere after initial script run
-        console.log(webSocketDebuggerUrl);
+        // console.log(webSocketDebuggerUrl);
 
         // Connecting the instance using `browserWSEndpoint`
         // Replace "webSocketDebuggerUrl" with what you copied before second run to connect 
         // to same chrome instance where you've already logged into opensea with metamask
         const browser = await puppeteer.connect({ browserWSEndpoint: webSocketDebuggerUrl, defaultViewport: null });
-        const page = await browser.newPage();
-        page.setDefaultTimeout(10000);
+        const page = await browser.newPage();        
+        page.setDefaultTimeout(0);
+        await page.goto("https://opensea.io/login?referrer=%2Faccount")
+
+        await page.waitForNavigation(`https://opensea.io/collection/${collection_name}`)
+        console.log("continue sir");
+        await page.goto(`https://opensea.io/collection/${collection_name}`);
 
         // create errors stream
         const stream = fs.createWriteStream(path.join(__dirname, "errors.log"), { flags: "a" })
@@ -61,7 +67,7 @@ const searchBeforeUpload = false;
                         await page.click("#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > div:nth-child(4) > div > div > div > div.AssetSearchView--results.collection--results > div.Blockreact__Block-sc-1xf18x6-0.dBFmez.AssetsSearchView--assets > div.fresnel-container.fresnel-greaterThanOrEqual-sm > div > div > div > article > a > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.SpaceBetweenreact__SpaceBetween-sc-jjxyhg-0.AssetCardFooterreact__StyledContainer-sc-nedjig-0.bFcjdD.jYqxGr.gJwgfT.cBTfDg")
                         uploaded = true
                     } catch (error) {
-                        if (error == "TimeoutError: waiting for selector `#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > div:nth-child(4) > div > div > div > div.AssetSearchView--results.collection--results > div.Blockreact__Block-sc-1xf18x6-0.dBFmez.AssetsSearchView--assets > div.fresnel-container.fresnel-greaterThanOrEqual-sm > div > div > div > article > a > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.SpaceBetweenreact__SpaceBetween-sc-jjxyhg-0.AssetCardFooterreact__StyledContainer-sc-nedjig-0.bFcjdD.jYqxGr.gJwgfT.cBTfDg` failed: timeout 10000ms exceeded") { 
+                        if (error == "TimeoutError: waiting for selector `#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > div:nth-child(4) > div > div > div > div.AssetSearchView--results.collection--results > div.Blockreact__Block-sc-1xf18x6-0.dBFmez.AssetsSearchView--assets > div.fresnel-container.fresnel-greaterThanOrEqual-sm > div > div > div > article > a > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.SpaceBetweenreact__SpaceBetween-sc-jjxyhg-0.AssetCardFooterreact__StyledContainer-sc-nedjig-0.bFcjdD.jYqxGr.gJwgfT.cBTfDg` failed: timeout 10000ms exceeded") {
                             uploaded = false
                         }
                     }
@@ -70,7 +76,7 @@ const searchBeforeUpload = false;
                 if (uploaded) {
                     continue
                 }
-                
+
                 await page.goto(`https://opensea.io/collection/${collection_name}/assets/create`);
 
                 // select nft for upload

@@ -4,13 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node nftUploader.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.22.0",    
-    "chrome-launcher": "^0.14.1",            
-    "puppeteer": "^10.4.0"    
+    "@chainsafe/dappeteer": "^2.4.1",
+    "axios": "^0.22.0",
+    "chrome-launcher": "^0.14.1",
+    "puppeteer-core": "^13.5.2"
   }
 }
