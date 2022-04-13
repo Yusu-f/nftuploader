@@ -33,25 +33,26 @@ const searchBeforeUpload = false;
         const { webSocketDebuggerUrl } = response.data;
 
         // Copy this log somewhere after initial script run
-        // console.log(webSocketDebuggerUrl);
+        console.log(webSocketDebuggerUrl);
 
         // Connecting the instance using `browserWSEndpoint`
         // Replace "webSocketDebuggerUrl" with what you copied before second run to connect 
         // to same chrome instance where you've already logged into opensea with metamask
-        const browser = await puppeteer.connect({ browserWSEndpoint: webSocketDebuggerUrl, defaultViewport: null });
-        const page = await browser.newPage();        
+        const browser = await puppeteer.connect({ browserWSEndpoint: "ws://localhost:49295/devtools/browser/3a859520-e26c-40cc-a99e-5537d92186ab", defaultViewport: null });
+        const page = await browser.newPage();
         page.setDefaultTimeout(0);
-        await page.goto("https://opensea.io/login?referrer=%2Faccount")
+        // await page.goto("https://opensea.io/")
+        // await page.goto(`https://opensea.io/collection/${collection_name}/assets/create`)
 
-        await page.waitForNavigation(`https://opensea.io/collection/${collection_name}`)
-        console.log("continue sir");
-        await page.goto(`https://opensea.io/collection/${collection_name}`);
+        // await page.waitForFunction((collection_name) => window.location.href == `https://opensea.io/collection/${collection_name}/assets/create`, {}, collection_name)
 
+        page.setDefaultTimeout(10000)
         // create errors stream
         const stream = fs.createWriteStream(path.join(__dirname, "errors.log"), { flags: "a" })
 
         // Begin upload
         for (let i = 0; i < arr.length; i++) {
+            console.log("beginning upload");
             let uploaded = false
             try {
                 if (searchBeforeUpload) {
@@ -91,11 +92,45 @@ const searchBeforeUpload = false;
                 // Enter data about the NFT
                 await page.waitForSelector("#name")
                 await page.type('#name', arr[i]);
+
+                await page.waitForSelector("#external_link")
+                await page.type('#external_link', "www.google.com", { delay: 100 });
+
+                await page.waitForSelector("#description")
                 await page.type('#description', 'This word has no meaning.');
 
+                await page.waitForSelector('button[aria-label="Add properties"]')
+                await page.click('button[aria-label="Add properties"]')
+
+                for (let i = 0; i < 5; i++) {
+                    await page.waitForSelector("body > div:nth-child(7) > div > div > div > section > button")
+                    await page.click("body > div:nth-child(7) > div > div > div > section > button")
+                }
+                                
+                const propertyFields = await page.$$('input[aria-label="Provide the property name"]')
+                const valueFields = await page.$$('input[aria-label="Provide the property value"]')
+
+                for (let i = 0; i < propertyFields.length; i++) {
+                    const property = propertyFields[i];
+                    const value = valueFields[i];
+                 
+                    await property.evaluate((property) => property.value = "A cool property name", property)
+                    await value.evaluate((value) => value.value = "A cool value", value)                    
+                }     
+                
+                // await page.waitForSelector('button[aria-label="Add levels"]')
+                // await page.click('button[aria-label="Add levels"]')   
+                
+                const chain = await page.$('#chain')
+                await chain.evaluate((chain) => chain.value = "Polygon", chain)          
+
+                await page.waitForSelector("i[aria-label='Close']")
+                await page.click("i[aria-label='Close']")
+                await page.waitForTimeout(2000)
+
                 // create button 
-                await page.waitForSelector("#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > section > div.CollectionManager--container.CollectionManager--container-with-margins.CollectionManager--container-with-topbar.CollectionManager--narrow-container > form > div.AssetForm--submit > div.AssetForm--action > span > button")
-                await page.click("#__next > div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.FlexColumnreact__FlexColumn-sc-1wwz3hp-0.OpenSeaPagereact__DivContainer-sc-65pnmt-0.dBFmez.jYqxGr.ksFzlZ.fiudwD.App > main > div > div > section > div.CollectionManager--container.CollectionManager--container-with-margins.CollectionManager--container-with-topbar.CollectionManager--narrow-container > form > div.AssetForm--submit > div.AssetForm--action > span > button")
+                await page.waitForSelector("div.AssetForm--submit button")
+                await page.click("div.AssetForm--submit button")
 
                 // cancel dialog
                 await page.waitForSelector("div.Blockreact__Block-sc-1xf18x6-0.Flexreact__Flex-sc-1twd32i-0.gWXeYL.jYqxGr > button")
@@ -133,8 +168,8 @@ const searchBeforeUpload = false;
                 continue
             }
         }
-        await browser.close();
-        await chrome.kill();
+        // await browser.close();
+        // await chrome.kill();
     } catch (error) {
         console.log(error);
     }
